@@ -19,7 +19,7 @@ Welcome to the backend for the Travel Accommodation Search Platform. This backen
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-org/travel-backend.git
+git clone https://github.com/neeshan-ibn-ismath/travel-site.git
 cd travel-backend
 ```
 
