@@ -1,0 +1,38 @@
+scalar UUID
+scalar Datetime
+
+
+type Venue {
+  id: UUID!
+  name: String!
+  town: String
+  district: String
+  accommodation_type: String
+  price: Float
+  star_rating: Int
+  phone_number: String
+  created_at: Datetime
+  updated_at: Datetime
+}
+
+type VenueWhatsAppLink {
+  venue_id: UUID!
+  venue_name: String!
+  phone_number: String!
+  whatsapp_url: String!
+}
+
+type Query {
+  searchVenues(
+    searchTown: String
+    searchDistrict: String
+    searchAccommodationType: String
+    minPrice: Float
+    maxPrice: Float
+    minStar: Int
+    maxStar: Int
+    requiredAmenities: [Int]
+  ): [Venue]
+
+  venueWhatsappLinks: [VenueWhatsAppLink]
+}

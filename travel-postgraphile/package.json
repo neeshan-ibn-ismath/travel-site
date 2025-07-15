@@ -1,0 +1,36 @@
+{
+  "name": "travel-postgraphile",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/server.ts",
+    "build": "tsc",
+    "migrate": "knex-migrate up",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "pg": "^8.16.3",
+    "postgraphile": "^4.14.1",
+    "postgraphile-plugin-connection-filter": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/knex": "^0.15.2",
+    "@types/node": "^24.0.13",
+    "knex": "^3.1.0",
+    "knex-migrate": "^1.7.4",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
