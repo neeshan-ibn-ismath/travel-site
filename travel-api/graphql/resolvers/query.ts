@@ -1,46 +1,53 @@
-import { GraphQLClient } from 'graphql-request';
-import { Request, Response } from 'express';
+import { pgClient } from '../../src/lib/postgraphile';
 
-// Define interfaces for the data you expect from PostGraphile
-
-export interface Venue {
-  id: string;
+interface Venue {
+  id: number;
   name: string;
-  town: string;
-  district: string;
-  accommodationType: string;
   price: number;
   starRating: number;
-  phoneNumber?: string;
-  createdAt?: string;
-  updatedAt?: string;
 }
 
-export interface VenueWhatsappLink {
-  venueId: string;
-  venueName: string;
-  phoneNumber: string;
-  whatsappUrl: string;
+interface BlogPost {
+  id: number;
+  title: string;
+  content: string;
 }
 
-const POSTGRAPHILE_ENDPOINT = 'http://localhost:5000/graphql';
-const client = new GraphQLClient(POSTGRAPHILE_ENDPOINT);
+interface Amenity {
+  id: number;
+  name: string;
+}
 
-const Query = {
-  searchVenues: async (
-    _: any,
-    args: {
-      searchTown?: string;
-      searchDistrict?: string;
-      searchAccommodationType?: string;
-      minPrice?: number;
-      maxPrice?: number;
-      minStar?: number;
-      maxStar?: number;
-      requiredAmenities?: number[];
-    },
-    ctx: { req: Request; res: Response }
-  ): Promise<Venue[]> => {
+interface SearchVenuesArgs {
+  searchTown?: string;
+  searchDistrict?: string;
+  searchAccommodationType?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  minStar?: number;
+  maxStar?: number;
+  requiredAmenities?: number[];
+}
+
+export const Query = {
+  allVenues: async (): Promise<Venue[]> => {
+    const query = `
+      query {
+        allVenues {
+          nodes {
+            id
+            name
+            price
+            starRating
+          }
+        }
+      }
+    `;
+    const response = await pgClient.request<{ allVenues: { nodes: Venue[] } }>(query);
+    return response.allVenues.nodes;
+  },
+
+  searchVenues: async (_: any, args: SearchVenuesArgs): Promise<Venue[]> => {
     const query = `
       query SearchVenues(
         $searchTown: String
@@ -50,7 +57,7 @@ const Query = {
         $maxPrice: Float
         $minStar: Int
         $maxStar: Int
-        $requiredAmenities: [Int]
+        $requiredAmenities: [Int!]
       ) {
         searchVenues(
           searchTown: $searchTown
@@ -62,52 +69,47 @@ const Query = {
           maxStar: $maxStar
           requiredAmenities: $requiredAmenities
         ) {
-          id
-          name
-          town
-          district
-          accommodationType
-          price
-          starRating
-          phoneNumber
-          createdAt
-          updatedAt
-        }
-      }
-    `;
-
-    // Type the response data
-    interface SearchVenuesResponse {
-      searchVenues: Venue[];
-    }
-
-    const data = await client.request<SearchVenuesResponse>(query, args);
-    return data.searchVenues;
-  },
-
-  venueWhatsappLinks: async (): Promise<VenueWhatsappLink[]> => {
-    const query = `
-      query {
-        allVenueWhatsappLinks {
           nodes {
-            venueId
-            venueName
-            phoneNumber
-            whatsappUrl
+            id
+            name
+            price
+            starRating
           }
         }
       }
     `;
+    const response = await pgClient.request<{ searchVenues: { nodes: Venue[] } }>(query, args);
+    return response.searchVenues.nodes;
+  },
 
-    interface VenueWhatsappLinksResponse {
-      allVenueWhatsappLinks: {
-        nodes: VenueWhatsappLink[];
-      };
-    }
+  allBlogPosts: async (): Promise<BlogPost[]> => {
+    const query = `
+      query {
+        allBlogPosts {
+          nodes {
+            id
+            title
+            content
+          }
+        }
+      }
+    `;
+    const response = await pgClient.request<{ allBlogPosts: { nodes: BlogPost[] } }>(query);
+    return response.allBlogPosts.nodes;
+  },
 
-    const data = await client.request<VenueWhatsappLinksResponse>(query);
-    return data.allVenueWhatsappLinks.nodes;
+  allAmenities: async (): Promise<Amenity[]> => {
+    const query = `
+      query {
+        allAmenities {
+          nodes {
+            id
+            name
+          }
+        }
+      }
+    `;
+    const response = await pgClient.request<{ allAmenities: { nodes: Amenity[] } }>(query);
+    return response.allAmenities.nodes;
   },
 };
-
-export default Query;

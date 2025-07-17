@@ -1,28 +1,86 @@
 scalar UUID
-scalar Datetime
+scalar Cursor
 
+# --- Core Types ---
 
 type Venue {
   id: UUID!
   name: String!
+  description: String
+  price: Float
+  starRating: Int
   town: String
   district: String
-  accommodation_type: String
-  price: Float
-  star_rating: Int
-  phone_number: String
-  created_at: Datetime
-  updated_at: Datetime
+  accommodationType: String
+  amenities: [VenueAmenity!]
+  whatsappLink: VenueWhatsappLink
+  createdAt: String
+  updatedAt: String
 }
 
-type VenueWhatsAppLink {
-  venue_id: UUID!
-  venue_name: String!
-  phone_number: String!
-  whatsapp_url: String!
+type VenueAmenity {
+  venueId: UUID!
+  amenityId: Int!
+  amenity: Amenity
 }
+
+type Amenity {
+  id: Int!
+  name: String!
+}
+
+type VenueWhatsappLink {
+  venueId: UUID!
+  phoneNumber: String!
+  url: String!
+}
+
+type User {
+  id: UUID!
+  name: String!
+  email: String!
+}
+
+type BlogPost {
+  id: UUID!
+  title: String!
+  content: String!
+  authorId: UUID!
+  createdAt: String!
+  updatedAt: String!
+  tags: [BlogTag!]
+  comments: [BlogComment!]
+}
+
+type BlogComment {
+  id: UUID!
+  postId: UUID!
+  content: String!
+  authorId: UUID!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type BlogTag {
+  id: Int!
+  name: String!
+}
+
+# --- Connections ---
+
+type VenuesConnection {
+  nodes: [Venue!]!
+  totalCount: Int
+}
+
+type BlogPostsConnection {
+  nodes: [BlogPost!]!
+}
+
+# --- Root Query ---
 
 type Query {
+  allVenues: [Venue!]!
   searchVenues(
     searchTown: String
     searchDistrict: String
@@ -31,8 +89,40 @@ type Query {
     maxPrice: Float
     minStar: Int
     maxStar: Int
-    requiredAmenities: [Int]
-  ): [Venue]
+    requiredAmenities: [Int!]
+  ): [Venue!]!
+  allBlogPosts: [BlogPost!]!
+  allAmenities: [Amenity!]!
+}
 
-  venueWhatsappLinks: [VenueWhatsAppLink]
+# --- Input Types ---
+
+input CreateVenueInput {
+  name: String!
+  description: String
+  price: Float
+  starRating: Int
+  town: String
+  district: String
+  accommodationType: String
+}
+
+input CreateBlogPostInput {
+  title: String!
+  content: String!
+  authorId: UUID!
+}
+
+input CreateBlogCommentInput {
+  postId: UUID!
+  content: String!
+  authorId: UUID!
+}
+
+# --- Root Mutation ---
+
+type Mutation {
+  createVenue(input: CreateVenueInput!): Venue
+  createBlogPost(input: CreateBlogPostInput!): BlogPost
+  createBlogComment(input: CreateBlogCommentInput!): BlogComment
 }
