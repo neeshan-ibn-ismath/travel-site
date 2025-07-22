@@ -1,5 +1,6 @@
 scalar UUID
 scalar Cursor
+scalar DateTime
 
 # --- Core Types ---
 
@@ -14,8 +15,9 @@ type Venue {
   accommodationType: String
   amenities: [VenueAmenity!]
   whatsappLink: VenueWhatsappLink
-  createdAt: String
-  updatedAt: String
+  ratings: [VenueRating!]
+  createdAt: DateTime
+  updatedAt: DateTime
 }
 
 type VenueAmenity {
@@ -35,10 +37,35 @@ type VenueWhatsappLink {
   url: String!
 }
 
+type VenueRating {
+  id: UUID!
+  venueId: UUID!
+  userId: UUID!
+  rating: Int!
+  comment: String
+  createdAt: DateTime!
+}
+
+type SavedVenue {
+  id: UUID!
+  userId: UUID!
+  venueId: UUID!
+  savedAt: DateTime!
+}
+
+type Inquiry {
+  id: UUID!
+  venueId: UUID!
+  userId: UUID!
+  message: String!
+  createdAt: DateTime!
+}
+
 type User {
   id: UUID!
   name: String!
   email: String!
+  savedVenues: [SavedVenue!]
 }
 
 type BlogPost {
@@ -46,8 +73,8 @@ type BlogPost {
   title: String!
   content: String!
   authorId: UUID!
-  createdAt: String!
-  updatedAt: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   tags: [BlogTag!]
   comments: [BlogComment!]
 }
@@ -57,11 +84,16 @@ type BlogComment {
   postId: UUID!
   content: String!
   authorId: UUID!
-  createdAt: String!
-  updatedAt: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type BlogTag {
+  id: Int!
+  name: String!
+}
+
+type BlogCategory {
   id: Int!
   name: String!
 }
@@ -91,8 +123,13 @@ type Query {
     maxStar: Int
     requiredAmenities: [Int!]
   ): [Venue!]!
+
   allBlogPosts: [BlogPost!]!
   allAmenities: [Amenity!]!
+  allUsers: [User!]!
+  allBlogCategories: [BlogCategory!]!
+  allBlogTags: [BlogTag!]!
+  allVenueWhatsappLinks: [VenueWhatsappLink!]!
 }
 
 # --- Input Types ---
@@ -119,10 +156,54 @@ input CreateBlogCommentInput {
   authorId: UUID!
 }
 
+input CreateInquiryInput {
+  venueId: UUID!
+  userId: UUID!
+  message: String!
+}
+
+input CreateVenueRatingInput {
+  venueId: UUID!
+  userId: UUID!
+  rating: Int!
+  comment: String
+}
+
+input SaveVenueInput {
+  userId: UUID!
+  venueId: UUID!
+}
+
+input CreateUserInput {
+  name: String!
+  email: String!
+  password: String!
+}
+
+input CreateBlogTagInput {
+  name: String!
+}
+
+input CreateBlogCategoryInput {
+  name: String!
+}
+
 # --- Root Mutation ---
 
 type Mutation {
   createVenue(input: CreateVenueInput!): Venue
   createBlogPost(input: CreateBlogPostInput!): BlogPost
   createBlogComment(input: CreateBlogCommentInput!): BlogComment
+  unsaveVenue(input: SaveVenueInput!): Boolean!
+
+  deleteBlogPost(id: UUID!): Boolean
+  deleteBlogComment(id: UUID!): Boolean
+
+  createInquiry(input: CreateInquiryInput!): Inquiry
+  createVenueRating(input: CreateVenueRatingInput!): VenueRating
+  saveVenue(input: SaveVenueInput!): SavedVenue
+
+  createUser(input: CreateUserInput!): User
+  createBlogTag(input: CreateBlogTagInput!): BlogTag
+  createBlogCategory(input: CreateBlogCategoryInput!): BlogCategory
 }
