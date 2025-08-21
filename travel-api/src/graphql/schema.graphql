@@ -1,6 +1,8 @@
 scalar UUID
 scalar Cursor
 scalar DateTime
+scalar Date
+
 
 # --- Core Types ---
 
